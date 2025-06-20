@@ -10,17 +10,25 @@ var timeline = [];
 // 2. jsPsych-Initalisierung
 const jsPsych = initJsPsych({
   on_finish: function () {
-    // Export all data as CSV and trigger download
-    const csv = jsPsych.data.get().csv();
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'experiment_data.csv';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+      // 1) CSV generieren
+      const csv = jsPsych.data.get().csv();
+
+      // 2) per fetch-POST an /experiment-data senden
+      fetch('/experiment-data', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain'
+        },
+        body: csv
+      })
+      .then(response => response.text())
+      .then(msg => {
+        console.log(msg); // "Experiment-Daten erfolgreich gespeichert"
+      })
+      .catch(error => {
+        console.error('Fehler beim Speichern der Daten:', error);
+        alert('Fehler beim Speichern der Daten.');
+      });
   },
 });
 

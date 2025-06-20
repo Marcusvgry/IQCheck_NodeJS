@@ -1,9 +1,10 @@
 // jspsych-standard-progressive-matrices.js
-// Version 1.6.6 – mit per-page Datenaufzeichnung inkl. question_number, prompt, instructions und time_limit-Zeile
-var jsPsychStandardProgressiveMatrices = (function (jspsych) {
+// Version 1.6.6 – per-page Datenaufzeichnung inkl. question_number, prompt, instructions, time_limit
+// Toggle-Auswahl auf Auswahlseite, Feedbackseite blockiert Klicks und Hover
+
+var jsPsychStandardProgressiveMatrices = (function(jspsych) {
   "use strict";
 
-  /* ---------- Parameter ---------- */
   const info = {
     name: "jsPsychStandardProgressiveMatrices",
     version: "1.6.6",
@@ -17,7 +18,7 @@ var jsPsychStandardProgressiveMatrices = (function (jspsych) {
     },
   };
 
-  /* Helper: DOM-Element erstellen */
+  // Helper: DOM-Element erstellen
   const el = (tag, idOrCls, parent, html = "") => {
     const d = document.createElement(tag);
     if (idOrCls?.startsWith("#")) d.id = idOrCls.slice(1);
@@ -33,11 +34,11 @@ var jsPsychStandardProgressiveMatrices = (function (jspsych) {
     }
 
     trial(display_element, trial) {
+      // 1) Parameter prüfen
       if (!Array.isArray(trial.pages) || trial.pages.length === 0) {
         throw new Error("Keine Seiten definiert.");
       }
-
-      // Seiten kopieren und Parameter auslesen
+      // 2) Seiten kopieren
       const pages = trial.pages.map(p => ({
         stimulus:       p.stimulus,
         choices:        p.choices.slice(),
@@ -46,7 +47,7 @@ var jsPsychStandardProgressiveMatrices = (function (jspsych) {
         correct_choice: p.correct_choice ?? null
       }));
 
-      let idx          = 0;
+      let idx         = 0;
       const responses   = [];
       const correctness  = [];
       const stamps       = [];
@@ -56,12 +57,12 @@ var jsPsychStandardProgressiveMatrices = (function (jspsych) {
 
       // Grund-Layout
       display_element.innerHTML = "";
-      const header    = el("div", "#spm-header", display_element);
-      const counter   = el("div", "#spm-page-counter", header);
-      const timerDiv  = el("div", "#spm-timer", header);
+      const header   = el("div", "#spm-header", display_element);
+      const counter  = el("div", "#spm-page-counter", header);
+      const timerDiv = el("div", "#spm-timer", header);
 
-      const barWrap   = el("div", "#spm-progress", display_element);
-      const barFill   = el("div", "#spm-progress-bar", barWrap);
+      const barWrap  = el("div", "#spm-progress", display_element);
+      const barFill  = el("div", "#spm-progress-bar", barWrap);
 
       const container = el("div", "#spm-container", display_element);
 
@@ -82,25 +83,51 @@ var jsPsychStandardProgressiveMatrices = (function (jspsych) {
 
       // Render-Funktion
       const render = () => {
+        // fixe Höhe beim Wechseln, damit nichts springt
         if (idx > 0) {
           container.style.minHeight = container.clientHeight + "px";
         }
 
-        stamps.push(performance.now());
-        counter.textContent = `${idx + 1}.`;
-        barFill.style.width  = (((idx + 1) / pages.length) * 100).toFixed(1) + "%";
+        // CSS für Feedbackmodus (einmalig injizieren)
+        if (!document.getElementById("spm-feedback-css")) {
+          const st = document.createElement("style");
+          st.id = "spm-feedback-css";
+          st.textContent = `
+            /* Feedback: keine Pointer-Events und kein Hover */
+            .feedback .spm-item-container {
+              pointer-events: none !important;
+              cursor: default !important;
+              transform: none !important;
+              box-shadow: none !important;
+            }
+          `;
+          document.head.appendChild(st);
+        }
 
+        // Fortschrittsanzeige
+        counter.textContent = `${idx + 1}.`;
+        barFill.style.width = `${(((idx + 1) / pages.length) * 100).toFixed(1)}%`;
+
+        // Stimulus-Daten
         const { stimulus, choices, prompt, instructions } = pages[idx];
 
+        // Timestamp für RT
+        stamps.push(performance.now());
+
+        // HTML aufbauen
         container.innerHTML = `
-          <div id="spm-prompt-box"><div id="spm-prompt-text">${prompt}</div></div>
+          <div id="spm-prompt-box">
+            <div id="spm-prompt-text">${prompt}</div>
+          </div>
           <div id="spm-stimulus-box" style="background:#fff;">
             <img class="spm-stimulus-image" src="${stimulus}" style="background:#fff;">
           </div>
-          <div id="spm-instructions-box"><div id="spm-instructions-text">${instructions}</div></div>
+          <div id="spm-instructions-box">
+            <div id="spm-instructions-text">${instructions}</div>
+          </div>
           <div id="spm-gray-box" style="visibility:hidden;">
             ${choices.map((url,i) => `
-              <div class="spm-item-container">
+              <div class="spm-item-container" data-idx="${i}">
                 <img src="${url}">
                 <input type="checkbox" name="spm-choice">
                 <div class="spm-label">${letters[i]}.</div>
@@ -114,7 +141,7 @@ var jsPsychStandardProgressiveMatrices = (function (jspsych) {
             <button id="spm-next">Weiter</button>
           </div>`;
 
-        // Sichtbar machen, wenn alle Bilder geladen
+        // Sichtbar machen, wenn alle Bilder geladen sind
         const gray   = container.querySelector("#spm-gray-box");
         const footer = container.querySelector("#spm-footer");
         const imgs   = Array.from(container.querySelectorAll("img"));
@@ -131,80 +158,87 @@ var jsPsychStandardProgressiveMatrices = (function (jspsych) {
           else img.addEventListener("load", unveil, { once: true });
         });
 
-        // Interaktion
+        // Interaktion: Toggle-Auswahl nur auf Auswahlseite
         const boxes   = Array.from(container.querySelectorAll(".spm-item-container"));
         const nextBtn = container.querySelector("#spm-next");
         const skipChk = container.querySelector("#spm-skip");
         const skipWrp = container.querySelector("#spm-skip-container");
 
-        boxes.forEach((box) => {
-  const cb = box.querySelector("input");
-  box.onclick = (e) => {
-    if (e.target.tagName === "INPUT") return;
-    // Wenn dieses Kästchen schon angehakt ist → abwählen
-    if (cb.checked) {
-      cb.checked = false;
-      this.sel[this.idx] = null;
-    } else {
-      // Sonst: alle abwählen und dieses anhaken
-      boxes.forEach((b) => b.querySelector("input").checked = false);
-      cb.checked = true;
-      this.sel[this.idx] = parseInt(box.dataset.idx, 10);
-      skipWrp.classList.remove("visible");
-    }
-  };
-});
+        if (!container.classList.contains("feedback")) {
+          boxes.forEach(box => {
+            const cb = box.querySelector("input[type=checkbox]");
+            box.onclick = () => {
+              if (cb.checked) {
+                cb.checked = false;
+              } else {
+                boxes.forEach(b => b.querySelector("input").checked = false);
+                cb.checked = true;
+              }
+              skipWrp.classList.remove("visible");
+            };
+          });
 
+          nextBtn.onclick = () => {
+            const rt = performance.now() - stamps[idx];
+            rts.push(rt);
 
-        nextBtn.onclick = () => {
-          const rt = performance.now() - stamps[idx];
-          rts.push(rt);
+            const selIdx = boxes.findIndex(b => b.querySelector("input").checked);
+            const resp   = selIdx >= 0 ? selIdx + 1 : "skipped";
+            const corrCh = pages[idx].correct_choice;
+            const isCorr = corrCh != null && resp !== "skipped" && corrCh === resp ? "yes" : "no";
 
-          const selIdx = boxes.findIndex(b => b.querySelector("input").checked);
-          const resp   = selIdx >= 0 ? selIdx + 1 : "skipped";
-          const corrCh = pages[idx].correct_choice;
-          const isCorr = corrCh != null && resp !== "skipped" && corrCh === resp ? "yes" : "no";
+            if (trial.required && resp === "skipped" && !skipChk.checked) {
+              if (trial.allow_skipping) skipWrp.classList.add("visible");
+              return;
+            }
 
-          if (trial.required && resp === "skipped" && !skipChk.checked) {
-            if (trial.allow_skipping) skipWrp.classList.add("visible");
-            return;
-          }
-
-          responses.push(resp);
-          correctness.push(isCorr);
-          idx++;
-          if (idx < pages.length) render();
-          else finish();
-        };
+            responses.push(resp);
+            correctness.push(isCorr);
+            idx++;
+            if (idx < pages.length) render();
+            else finish();
+          };
+        } else {
+          // Feedbackmodus: keine Klicks auf Items
+          boxes.forEach(box => box.onclick = null);
+          nextBtn.onclick = () => {
+            this.feedback = false;
+            idx++;
+            if (idx < pages.length) render();
+            else finish();
+          };
+        }
       };
 
-      // Finish-Funktion: pro Seite eine Zeile, dann Zeitlimit-Zeile
+      // Finish: pro Seite einen Datensatz + Abschlusszeile
       const finish = () => {
         clearInterval(timer);
-        const dataArray = this.jsPsych.data.get();
-        // pro Seite
+        const dataRows = this.jsPsych.data.get().values();
         responses.forEach((choice, i) => {
-          dataArray.push({
-            trial_type:     info.name,
-            question_number:i + 1,
-            stimulus:       pages[i].stimulus,
-            choices:        pages[i].choices,
-            prompt:         pages[i].prompt,
-            instructions:   pages[i].instructions,
-            correct_choice: pages[i].correct_choice,
-            choice:         choice,
-            correct:        correctness[i],
-            rt:             rts[i]
+          const p = pages[i];
+          const corrIx  = (p.correct_choice ?? 1) - 1;
+          const isCorr  = correctness[i];
+          dataRows.push({
+            trial_type:      info.name,
+            question_number: i + 1,
+            stimulus:        p.stimulus,
+            choices:         p.choices.slice(),
+            prompt:          p.prompt,
+            instructions:    p.instructions,
+            correct_choice:  p.correct_choice,
+            choice:          choice,
+            correct:         isCorr,
+            rt:              rts[i]
           });
         });
-        // Zusammenfassungs-Zeile mit time_limit
-        dataArray.push({
+        dataRows.push({
           trial_type: info.name,
           time_limit: trial.time_limit
         });
         this.jsPsych.finishTrial();
       };
 
+      // Starte Rendering
       render();
     }
   }
