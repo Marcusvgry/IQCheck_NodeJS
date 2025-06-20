@@ -1,0 +1,128 @@
+/* 0) Wrapper auf volle Höhe und zentriert */
+html,
+body,
+#jspsych-content-wrapper {
+  width: 100% !important; /* 90% der Breite */ /* Maximalbreite */
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;    /* vertikale Zentrierung bei kurzem Inhalt */
+  align-items: center !important;        /* horizontale Zentrierung */
+
+  /* statt fester Höhe: Mindesthöhe, damit Flexbox bei kleineren Inhalten zentriert */
+  min-height: 100vh !important;
+
+  height:auto !important; /* volle Höhe = Viewport */
+
+  /* erlauben, dass bei zu viel Inhalt gescrollt wird */
+  overflow-y: auto !important;
+
+  /* kein zusätzliches Abschneiden oder Versatz */
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+
+/* 0.1) Content selbst in beiden Achsen mittig */
+#jspsych-content {
+  margin: auto !important;
+}
+
+/* ---- 3) Beispiel für Angular Material ---- */
+.mat-form-field-required-marker {
+  display: none !important;
+}
+
+.instructions {
+  max-width: 800px;
+  margin: 2em auto;
+  font-size: 18px;
+  line-height: 1.6;  
+}
+
+.instructions ul {
+  margin-left: 2em !important;
+  padding-left: 1em !important;
+  list-style-type: disc !important;
+}
+
+.instructions p {
+  margin-bottom: 1em !important;
+}
+
+.jspsych-survey-likert-question {
+  margin-bottom: 1.2rem !important;
+}
+.jspsych-survey-likert .jspsych-survey-likert-likert {
+  display: flex !important;
+  justify-content: space-between !important;
+  max-width: 700px !important;
+  margin: 0.5rem auto !important;
+}
+.jspsych-survey-likert .jspsych-survey-likert-column {
+  text-align: center !important;
+}
+.jspsych-btn {
+  background-color: #1abc9c; /* Frisches Türkis-Grün */
+  color: #ffffff; /* Weißer Text */
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.jspsych-btn:hover {
+  background-color: #16a085; /* Etwas dunkler für den Hover‐Effekt */
+  transform: translateY(-1px); /* Leichte „Hebe“-Animation */
+}
+
+.jspsych-btn:active {
+  background-color: #117a65; /* Noch dunkler beim Klicken */
+  transform: translateY(0); /* Rückkehr zum „Standard-Raster“ */
+}
+
+.jspsych-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(26, 188, 156, 0.5); /* Dezenter Fokus-Ring */
+}
+
+/* Platzhalter für Audio-Testbereich */
+#audio-test-container {
+  margin-top: 30px;
+  min-height: 120px;
+  text-align: center;
+}
+#audio-test-button,
+#audio-test-question {
+  display: inline-block;
+}
+#audio-test-button {
+  margin-bottom: 1rem;
+}
+#audio-test-question {
+  display: none;
+  margin-top: 20px;
+  font-size: 1rem;
+}
+
+/* 1) Den gesamten Fragen-Block auf 800px begrenzen und zentrieren */
+.jspsych-survey-multi-choice-question {
+  max-width: 800px !important;
+  margin: 0 auto !important;
+  text-align: left !important; /* prompt-Text bleibt linksbündig */
+}
+
+/* 2) Jede einzelne Option auf dieselbe Breite + Zentrierung zwingen */
+.jspsych-survey-multi-choice-option {
+  max-width: 800px !important;
+  margin: 0 auto !important;
+  padding-top: 0.5em !important; /* optional: Abstand zwischen den Options */
+}
+
+.jspsych-survey-multi-choice-option label {
+  display: block !important; /* Label inklusive Input auf eigene Zeile */
+  font-size: 18px !important; /* gleiche Schriftgröße */
+  line-height: 1.6 !important; /* gleicher Zeilenabstand */
+  /* … und bei Bedarf background/border identisch zu .instructions … */
+}
