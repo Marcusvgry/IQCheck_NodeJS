@@ -1,28 +1,73 @@
-/******************** Farb-Variablen ********************/
+/* =============================================================
+   Enhanced Stylesheet v12.2 – jsPsych Standard Progressive Matrices
+   Palette: Mist Blue (Hue ≈ 210°)
+   ============================================================= */
+
+/******************** 1. Root Tokens ********************/
 :root {
-  --primary-color: #333;
-  --secondary-color: #555;
-  --secondary-dark: #d0d0d0;
-  --accent-color: #009688; /* Türkis */
-  --bg-color: #f7f7f7;
-  --box-bg: #fff;
-  --border-color: #ddd;
-  font-family: "Segoe UI", Roboto, sans-serif;
-  font-size: calc(0.9rem + 0.18vw);
+  /* Mist-Blue palette */
+  --clr-accent-h: 210;
+  --accent-50: hsl(210 28% 97%);
+  --accent-100: hsl(210 24% 92%);
+  --accent-200: hsl(210 22% 84%);
+  --accent-300: hsl(210 20% 70%);
+  --accent-400: hsl(210 22% 60%);
+  --accent-500: hsl(210 24% 50%);
+  --accent-600: hsl(210 26% 42%);
+  --accent-700: hsl(210 28% 36%);
+
+  /* Neutrals */
+  --grey-100: #fff;
+  --grey-200: #f7f7f7;
+  --grey-300: #e6e6e6;
+  --grey-400: #d0d0d0;
+  --grey-500: #9e9e9e;
+  --grey-600: #666;
+  --grey-700: #444;
+  --grey-800: #222;
+  --grey-900: #151515;
+
+  /* Semantic */
+  --primary-color: var(--grey-800);
+  --secondary-color: var(--grey-600);
+  --accent-color: var(--accent-500);
+  --box-bg: var(--grey-100);
+  --bg-color: var(--grey-200);
+  --border-color: var(--grey-300);
+  --success-bg: hsla(141, 45%, 55%, 0.23);
+  --danger-bg: hsla(4, 70%, 55%, 0.23);
+
+  /* Typography */
+  --font-base: clamp(1rem, 0.9rem+0.45vw, 1.2rem);
+  --lh-base: 1.45;
+  font-family: "Segoe UI", Roboto, system-ui, sans-serif;
+  font-size: var(--font-base);
+  line-height: var(--lh-base);
   color: var(--primary-color);
-}
-body.dark {
-  --primary-color: #eaeaea;
-  --secondary-color: var(--secondary-dark);
-  --bg-color: #101010;
-  --box-bg: #1c1c1c;
-  --border-color: #444;
-  background: #101010;
-}
-body:not(.dark) {
-  background: #f7f7f7;
+  background: var(--bg-color);
+  scroll-behavior: smooth;
 }
 
+/******************** Dark-Mode Override ********************/
+body.dark {
+  --clr-accent-h: 214;
+  --accent-50: hsl(214 30% 95%);
+  --accent-100: hsl(214 26% 88%);
+  --accent-200: hsl(214 24% 78%);
+  --accent-300: hsl(214 22% 64%);
+  --accent-400: hsl(214 24% 56%);
+  --accent-500: hsl(214 26% 48%);
+  --accent-600: hsl(214 28% 42%);
+  --accent-700: hsl(214 30% 36%);
+
+  --primary-color: var(--grey-100);
+  --secondary-color: var(--grey-400);
+  --box-bg: var(--grey-900);
+  --bg-color: var(--grey-800);
+  --border-color: var(--grey-700);
+}
+
+/******************** 2. Reset & Generics ********************/
 *,
 *::before,
 *::after {
@@ -30,311 +75,687 @@ body:not(.dark) {
   margin: 0;
   padding: 0;
 }
-
-/* #jspsych-content-wrapper {
-  min-height: 100vh; /* volle Höhe = Viewport 
-  display: flex;
-  justify-content: center;
-  align-items: center;
+a {
+  text-decoration: none;
+  color: inherit;
 }
-  */
+
+/******************** 3. Header ********************/
 #jspsych-content {
+  max-width: 1800px;
+  margin-inline: auto;
   width: 100%;
-  max-width: 1800px;
-  margin: 0 auto;
 }
-
-/******************** Header (zoom-sicher) ********************/
 #spm-header {
-  width: 70%;
-  max-width: 1800px;
-  margin: 0.6rem auto 0.4rem;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;  /* ← links, Timer, rechts */
-  align-items: center;
-  gap: 0.6rem;
+  position: relative;
+  --gap: clamp(0.35rem, 0.8vw, 1rem);
+  width: min(70%, 1800px);
+  margin: 0rem auto 0.4rem;
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  min-height: 5.6rem !important; /* Increase and force exact height */
+  padding: 0.5rem 0 !important;
 }
-
+/* Page Counter */
 #spm-page-counter {
-  grid-column: 1;      /* links */
-  justify-self: start;
+  justify-self: start; /* Override to left-align */
+  font-size: clamp(2.4rem, 1.3em + 3vw, 3.5rem);
+  font-weight: 400;
+  color: #000;
+  line-height: 1;
+  background: var(--accent-50);
+  padding: 0.12em 0.6em;
+  border-radius: 9px;
+  flex: 0 0 auto !important;
 }
 
 #spm-timer {
-  grid-column: 2;      /* Mitte */
-  justify-self: center;
-}
-
-#spm-theme-btn {
-  width: 8.5rem; /* fixe Breite → kein Springen */
-  padding: 0.25rem 0.75rem;
-  font-size: 0.8em;
-  font-weight: 600;
-  font-family: inherit;
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  height: 2.5rem !important;
+  width: auto !important;
+  min-width: 5rem !important;
   text-align: center;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  cursor: pointer;
-  background: var(--box-bg);
-  display: none !important;
-}
-body.dark #spm-theme-btn {
-  background: var(--box-bg);
-  color: var(--primary-color);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--secondary-color);
 }
 
-/* Mobile < 640 px – alles untereinander, zentriert */
-@media (max-width: 640px) {
-  #spm-header {
-    grid-template-columns: 1fr;
-    gap: 0.4rem;
-    text-align: center;
-  }
-  #spm-page-counter,
-  #spm-timer,
-  #spm-theme-btn {
-    justify-self: center;
-  }
+/* Special styling for opacity-based hidden timer */
+#spm-timer[style*="opacity:0"] {
+  visibility: visible !important; /* Force it to take space */
 }
 
-/******************** Progress-Bar ********************/
+/******************** 4. Progress Bar ********************/
 #spm-progress {
-  width: 70%;
-  max-width: 1800px;
-  height: 6px;
+  width: min(70%, 1800px);
+  height: 10px;
+  margin: 0 auto 1.4rem;
   background: var(--border-color);
-  margin: 0 auto 0.8rem;
-  border-radius: 3px;
+  border-radius: 999px;
   overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.08);
+}
+#spm-progress::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 12px var(--accent-400);
+  pointer-events: none;
+  opacity: 0.55;
 }
 #spm-progress-bar {
   height: 100%;
-  width: 0;
-  background: var(--accent-color);
-  transition: width 0.2s ease;
+  width: 0%;
+  background: linear-gradient(90deg, var(--accent-400), var(--accent-600));
+  transition: width 0.45s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/******************** Haupt-Container ********************/
+/******************** 5. Card Container & Dividers ********************/
 #spm-container {
-  width: 70%;
-  max-width: 1800px;
-  margin: 0 auto 1.8rem;
+  width: min(70%, 1800px);
+  margin: 0 auto 2.2rem;
   background: var(--box-bg);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
-  padding: 1.35rem;
+  border-radius: 14px;
+  padding: clamp(1.25rem, 2.6vw, 2.3rem);
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
-  gap: 1.35rem;
+  gap: clamp(1rem, 2vw, 1.6rem);
+}
+#spm-container > * + * {
+  border-top: 1px solid var(--border-color);
 }
 
-/******************** Prompt & Instruktionen ********************/
+/******************** 6. Prompt & Instructions ********************/
 #spm-prompt-box,
 #spm-instructions-box {
   background: var(--bg-color);
-  padding: 0.675rem 0.9rem;
-  border-radius: 4px;
+  padding: 1rem 1.4rem;
+  border-radius: 10px;
+  color: var(--secondary-color);
+  text-align: center;
+  line-height: 1.4;
 }
-#spm-prompt-box {
-  min-height: 5rem;
+
+/******************** 7. Stimulus Box ********************/
+#spm-stimulus-box {
+  width: 100%;
+  max-width: 460px;
+  aspect-ratio: 1/1;
+  margin-inline: auto;
+  background: var(--grey-100);
+  border: 2px solid var(--border-color);
+  border-radius: 14px;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.05);
 }
-#spm-prompt-text,
-#spm-instructions-text {
-  font-size: 0.9em;
-  color: var(--secondary-color);
-  text-align: center;
-  line-height: 1.35;
+body.dark #spm-stimulus-box {
+  background: var(--grey-100);
 }
-
-/******************** Stimulus (großes Referenzbild) ********************/
-#spm-stimulus-box {
-  width: 100%;
-  max-width: 400px;
-  aspect-ratio: 1/1;
-  margin: 0 auto;
-  background: var(--box-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-body.dark #spm-stimulus-box,
-body.dark #spm-stimulus-box img {
-  background: #fff;
-}
-
 .spm-stimulus-image {
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
 
-/******************** Antwort-Bereich ********************/
+/******************** 8. Answer Grid ********************/
 #spm-gray-box {
-  width: 75%;
+  --size-min: 7.2rem;
+  --size-target: 9rem;
+  --size-max: 11rem;
+  width: 80%;
   margin: 0 auto;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.9rem;
+  gap: 1.1rem;
   justify-content: center;
-  padding: 0.9rem;
+  padding: 1.1rem;
   background: var(--bg-color);
-  border-radius: 8px;
+  border-radius: 14px;
 }
 
-/* Item-Container */
+/******************** 9. Answer Items ********************/
 .spm-item-container {
-  flex: 0 0 clamp(6.5rem, 8rem, 10rem);
-  max-width: 10rem;
+  flex: 0 0 clamp(var(--size-min), var(--size-target), var(--size-max));
+  aspect-ratio: 1/1.15;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
   background: var(--box-bg);
-  border: 0;
-  border-radius: 6px;
-  overflow: hidden;
-  cursor: pointer;
+  border: none;
+  border-radius: 12px;
   position: relative;
-  transition: transform 0.1s, box-shadow 0.1s;
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .spm-item-container:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.1);
+  transform: translateY(-6px) scale(1.06);
+  box-shadow: 0 0 0 2px var(--accent-400), 0 9px 22px rgba(0, 0, 0, 0.13);
+}
+.spm-item-container:has(input:checked) {
+  background: var(--accent-300);
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.08);
+}
+.spm-item-container:has(input:checked) .spm-label {
+  background: transparent;
+  color: var(--accent-700);
+}
+.spm-item-container:active {
+  animation: hapticFlash 0.15s ease-out;
+}
+@keyframes hapticFlash {
+  0% {
+    box-shadow: 0 0 0 0 var(--accent-300) inset;
+  }
+  50% {
+    box-shadow: 0 0 0 6px var(--accent-300) inset;
+  }
+  100% {
+    box-shadow: 0 0 0 0 var(--accent-300) inset;
+  }
 }
 
-/* Bild im Item */
+/* Feedback tint */
+.feedback .spm-item-container {
+  cursor: default;
+  transform: none;
+  box-shadow: none;
+}
+.feedback .spm-item-container[data-correct="true"] {
+  background: var(--success-bg);
+}
+.feedback .spm-item-container[data-incorrect="true"] {
+  background: var(--danger-bg);
+}
+
 .spm-item-container img {
-  width: 90%;
-  height: 80%; /* rundum Weißraum */
-  margin: 5% auto; /* gleichmäßig */
-  display: block;
+  width: 85%;
+  height: 75%;
   object-fit: contain;
+  margin: auto;
   background: #fff;
   border: none;
 }
-/* Label */
 .spm-label {
-  flex: 0 0 1rem;
   width: 100%;
+  height: 1.25rem;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding-right: 0.2rem;
-  font-size: 0.7em;
+  padding-right: 0.35rem;
+  font-size: 0.78em;
   font-weight: 700;
   color: var(--primary-color);
   background: var(--box-bg);
+  border-radius: 0 0 12px 12px;
+  background: transparent; /* statt var(--box-bg) */
+  transition: color 0.25s; /* kein bg-Transition mehr nötig */
 }
 body.dark .spm-label {
-  color: #ffffff;
+  color: var(--grey-100);
 }
 
-/* Auswahl-Highlight: komplette Box tinted */
-.spm-item-container:has(input:checked) {
-  background: rgba(0, 150, 136, 0.18);
-  transform: translateY(-1.5px);
-}
-.spm-item-container:has(input:checked):hover {
-  background: rgba(0, 150, 136, 0.26);
-  transform: translateY(-3px);
-}
-body.dark .spm-item-container:has(input:checked) {
-  background: rgba(0, 150, 136, 0.35);
-}
-
-/* Checkbox unsichtbar */
+/******************** 10. Hidden Checkbox ********************/
 .spm-item-container input[type="checkbox"] {
   display: none;
 }
 
-/* Label transparent, damit Tint auch den unteren Bereich färbt */
-.spm-item-container:has(input:checked) .spm-label {
-  background: transparent;
-}
-.spm-item-container input[type="checkbox"] {
-  display: none;
-}
-
-/******************** Ripple-Effekt ********************/
-.ripple {
+/******************** 11. Ripple Fallback ********************/
+.spm-item-container:active::after {
+  content: "";
   position: absolute;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.15);
-  transform: scale(0);
-  pointer-events: none;
-  opacity: 0;
-}
-.ripple.animate {
-  animation: ripple 0.4s ease-out;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(0, 0, 0, 0.07);
+  animation: ripple 0.45s ease-out;
 }
 @keyframes ripple {
+  from {
+    opacity: 1;
+  }
   to {
-    transform: scale(3);
     opacity: 0;
   }
 }
 
-/******************** Footer ********************/
+/******************** 12. Footer & Skip Checkbox ********************/
 #spm-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 0.9rem;
+  gap: 1.1rem;
+  flex-wrap: wrap;
 }
 #spm-skip-container {
   visibility: hidden;
   font-size: 0.9em;
   color: var(--secondary-color);
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
 }
 #spm-skip-container.visible {
   visibility: visible;
 }
-
-/* Skip-Checkbox */
 #spm-skip-container input {
   appearance: none;
   cursor: pointer;
-  width: 1.15em;
-  height: 1.15em;
-  border: 1.5px solid var(--accent-color);
-  border-radius: 3px;
-  position: relative;
+  width: 1.25em;
+  height: 1.25em;
+  border: 2px solid var(--accent-500);
+  border-radius: 4px;
   display: inline-block;
+  position: relative;
+  transition: background 0.2s, border-color 0.2s;
+}
+#spm-skip-container input:checked {
+  background: var(--accent-500);
+  border-color: var(--accent-500);
 }
 #spm-skip-container input:checked::before {
-  content: "";
+  content: "\2713";
+  color: #fff;
+  font-size: 0.8em;
   position: absolute;
-  inset: 3px;
-  background: var(--accent-color);
-  border-radius: 1px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
-/* Weiter-Button */
+/******************** 13. Next Button ********************/
 #spm-next {
-  padding: 0.7em 1.6em;
-  background: var(--accent-color);
+  padding: 0.9em 2.6em;
+  background: linear-gradient(90deg, var(--accent-400), var(--accent-600));
   color: #fff;
   border: none;
-  border-radius: 6px;
-  font-size: 1em;
-  font-weight: 600;
+  border-radius: 14px;
+  font-size: 1.02em;
+  font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
-  transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+  transition: transform 0.18s, box-shadow 0.25s;
+  position: relative;
+  overflow: hidden;
+}
+#spm-next::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.25);
+  mix-blend-mode: overlay;
+  pointer-events: none;
 }
 #spm-next:hover {
-  background: #00796b;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.14);
 }
 #spm-next:disabled {
   background: var(--border-color);
   color: var(--secondary-color);
   cursor: default;
   box-shadow: none;
+}
+
+/******************** 14. Motion Safe ********************/
+/******************** 15. Responsive Tweaks – COUNTER ADJUSTED ********************/
+
+/******************** Media – Höhen ************************/
+/* Proportionen wie bei max-height:700px, jetzt für Breite ≤ 1200px */
+@media (max-width: 1200px) {
+  :root {
+    --font-base: clamp(0.5rem, 0.4rem + 0.12vw, 0.65rem);
+  }
+
+  #spm-header {
+    height: 5rem;
+  }
+
+  #spm-container {
+    gap: 0.3rem;
+    padding-top: 0.6rem;
+    padding-bottom: 0;
+    margin-bottom: -0.2rem;
+  }
+  #spm-container > * + * {
+    padding-top: 0.4rem;
+  }
+
+  #spm-timer {
+    font-size: 1.5rem;
+    padding-top: 1rem;
+    gap: 0;
+  }
+
+  #spm-progress {
+    height: 3px;
+    margin: 0 auto 0.4rem;
+  }
+
+  #spm-stimulus-box {
+    max-width: 190px;
+    padding: 0.7rem;
+  }
+
+  #spm-gray-box {
+    width: 60% !important;
+    --size-target: 9.8rem !important;
+  }
+  #spm-prompt-box {
+    min-height: 7.2rem;
+  }
+  #spm-instructions-box {
+    line-height: 1.4;
+    padding: 0.3rem;
+  }
+
+  #spm-page-counter {
+    font-size: clamp(1rem, 1.4rem + 0.7vw, 1.5rem) !important;
+  }
+  #spm-next {
+    font-size: 0.58em;
+    padding: 0.5em 1em;
+  }
+  #spm-prompt-text,
+  #spm-instructions-text {
+    font-size: 0.5em !important;
+    padding: 0;
+  }
+
+  .spm-label {
+    font-size: 0.5em;
+    padding-bottom: 1rem;
+  }
+
+  #spm-skip-container {
+    font-size: 0.7em;
+    padding-bottom: 1rem;
+  }
+}
+
+/* Proportionen wie bei max-height:700px, jetzt für Breite ≤ 900px */
+@media (max-width: 900px) {
+  :root {
+    --font-base: clamp(0.5rem, 0.4rem + 0.12vw, 0.65rem);
+  }
+
+  #spm-header {
+    height: 5rem;
+  }
+
+  #spm-container {
+    gap: 0.3rem;
+    padding-top: 0.6rem;
+    padding-bottom: 0;
+    margin-bottom: -0.2rem;
+  }
+  #spm-container > * + * {
+    padding-top: 0.4rem;
+  }
+
+  #spm-timer {
+    font-size: 1.5rem;
+    padding-top: 1rem;
+    gap: 0;
+  }
+
+  #spm-progress {
+    height: 3px;
+    margin: 0 auto 0.4rem;
+  }
+
+  #spm-stimulus-box {
+    max-width: 190px;
+    padding: 0.7rem;
+  }
+
+  #spm-gray-box {
+    width: 60% !important;
+    --size-target: 9.8rem !important;
+  }
+  #spm-prompt-box {
+    min-height: 7.2rem;
+  }
+  #spm-instructions-box {
+    line-height: 1.4;
+    padding: 0.3rem;
+  }
+
+  #spm-page-counter {
+    font-size: clamp(1rem, 1.4rem + 0.7vw, 1.5rem) !important;
+  }
+  #spm-next {
+    font-size: 0.58em;
+    padding: 0.5em 1em;
+  }
+  #spm-prompt-text,
+  #spm-instructions-text {
+    font-size: 0.5em !important;
+    padding: 0;
+  }
+
+  .spm-label {
+    font-size: 0.5em;
+    padding-bottom: 1rem;
+  }
+
+  #spm-skip-container {
+    font-size: 0.7em;
+    padding-bottom: 1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  :root {
+    --font-base: clamp(0.46rem, 0.36rem + 0.15vw, 0.6rem);
+  } /* Schrift ↓ */
+  #spm-stimulus-box {
+    max-width: 200px;
+  } /* Stimulus ↑ */
+
+  #spm-gray-box {
+    width: 90%;
+    --size-target: 9.1rem;
+    gap: 0.4rem;
+  } /* Grid ↑ */
+  #spm-page-counter {
+    font-size: clamp(0.85rem, 0.55rem + 0.8vw, 1.1rem) !important;
+  }
+  #spm-timer {
+    font-size: 0.64rem;
+  }
+
+  #spm-next {
+    font-size: 0.7em;
+    padding: 0.55em 1.5em;
+  }
+  #spm-prompt-box {
+    min-height: 2rem;
+  }
+  #spm-prompt-text,
+  #spm-instructions-text {
+    font-size: 0.5em !important;
+  }
+}
+
+/******************** Media – Höhen ************************/
+@media (max-height: 850px) {
+  :root {
+    --font-base: clamp(0.5rem, 0.4rem + 0.12vh, 0.65rem);
+  }
+
+  #spm-header {
+    height: 5rem; /* Allow variable height on smaller screens */
+  }
+
+  #spm-container {
+    gap: 0.3rem;
+    padding-top: 0.6rem;
+    padding-bottom: 0rem;
+    margin-bottom: -0.2rem;
+  }
+  #spm-container > * + * {
+    padding-top: 0.4rem;
+  }
+
+  #spm-timer {
+    font-size: 1.5rem;
+    padding-top: 1rem;
+    gap: 0;
+  }
+
+  #spm-progress {
+    height: 3px;
+    margin: 0 auto 0.4rem;
+  }
+
+  #spm-stimulus-box {
+    max-width: 190px;
+    padding: 0.7rem;
+  }
+
+  #spm-gray-box {
+    width: 60% !important;
+    --size-target: 9.8rem !important;
+  }
+  #spm-prompt-box {
+    min-height: 7.6rem;
+  }
+  #spm-instructions-box {
+    line-height: 1.4;
+    padding: 0.3rem;
+  }
+
+  #spm-page-counter {
+    font-size: clamp(1rem, 1.4rem + 0.7vw, 1.5rem) !important;
+  }
+  #spm-next {
+    font-size: 0.58em;
+    padding: 0.5em 1em;
+  }
+  #spm-prompt-text,
+  #spm-instructions-text {
+    font-size: 0.5em !important;
+    padding: 0rem;
+  }
+
+  .spm-label {
+    font-size: 0.5em;
+    padding-bottom: 1rem;
+  }
+
+  #spm-skip-container {
+    font-size: 0.7em;
+    padding-bottom: 1rem;
+  }
+}
+
+@media (max-height: 700px) {
+  :root {
+    --font-base: clamp(0.5rem, 0.4rem + 0.12vh, 0.65rem);
+  }
+
+  #spm-header {
+    height: 5rem; /* Allow variable height on smaller screens */
+  }
+
+  #spm-container {
+    gap: 0.3rem;
+    padding-top: 0.6rem;
+    padding-bottom: 0rem;
+    margin-bottom: -0.2rem;
+  }
+  #spm-container > * + * {
+    padding-top: 0.4rem;
+  }
+
+  #spm-timer {
+    font-size: 1.5rem;
+    padding-top: 1rem;
+    gap: 0;
+  }
+
+  #spm-progress {
+    height: 3px;
+    margin: 0 auto 0.4rem;
+  }
+
+  #spm-stimulus-box {
+    max-width: 190px;
+    padding: 0.7rem;
+  }
+
+  #spm-gray-box {
+    width: 60% !important;
+    --size-target: 9.8rem !important;
+  }
+  #spm-prompt-box {
+    min-height: 7.2rem;
+  }
+  #spm-instructions-box {
+    line-height: 1.4;
+    padding: 0.3rem;
+  }
+
+  #spm-page-counter {
+    font-size: clamp(1rem, 1.4rem + 0.7vw, 1.5rem) !important;
+  }
+  #spm-next {
+    font-size: 0.58em;
+    padding: 0.5em 1em;
+  }
+  #spm-prompt-text,
+  #spm-instructions-text {
+    font-size: 0.5em !important;
+    padding: 0rem;
+  }
+
+  .spm-label {
+    font-size: 0.5em;
+    padding-bottom: 1rem;
+  }
+
+  #spm-skip-container {
+    font-size: 0.7em;
+    padding-bottom: 1rem;
+  }
+}
+
+/******************** Mobile Header Fallback ********************/
+@media (max-width: 640px) {
+  #spm-header {
+    grid-template-columns: 1fr;
+    text-align: center;
+    height: auto; /* Allow variable height on mobile */
+    padding-bottom: 0.6rem; /* Ensure consistent spacing */
+  }
+  #spm-page-counter,
+  #spm-timer {
+    position: static;
+    transform: none;
+    justify-self: center;
+  }
+  #spm-page-counter,
+  #spm-timer {
+    position: static;
+    transform: none;
+    justify-self: center;
+  }
 }

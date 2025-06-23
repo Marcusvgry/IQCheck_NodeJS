@@ -10,24 +10,24 @@ var timeline = [];
 // 2. jsPsych-Initalisierung
 const jsPsych = initJsPsych({
   on_finish: function () {
-      // 1) CSV generieren
-      const csv = jsPsych.data.get().csv();
+    // 1) CSV generieren
+    const csv = jsPsych.data.get().csv();
 
-      // 2) per fetch-POST an /experiment-data senden
-      fetch('/experiment-data', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'text/plain'
-        },
-        body: csv
-      })
-      .then(response => response.text())
-      .then(msg => {
+    // 2) per fetch-POST an /experiment-data senden
+    fetch("/experiment-data", {
+      method: "POST",
+      headers: {
+        "Content-Type": "text/plain",
+      },
+      body: csv,
+    })
+      .then((response) => response.text())
+      .then((msg) => {
         console.log(msg); // "Experiment-Daten erfolgreich gespeichert"
       })
-      .catch(error => {
-        console.error('Fehler beim Speichern der Daten:', error);
-        alert('Fehler beim Speichern der Daten.');
+      .catch((error) => {
+        console.error("Fehler beim Speichern der Daten:", error);
+        alert("Fehler beim Speichern der Daten.");
       });
   },
 });
@@ -74,9 +74,9 @@ var einleitung = {
     </div>
   `,
   choices: ["Testgeräusch abspielen"],
-  data: { 
+  data: {
     noiseHalf: noiseHalf,
-  }
+  },
 };
 
 // 5.3 Erste Frage: Audio-Test (nur 2 Sekunden)
@@ -137,7 +137,8 @@ const Instructions1 = {
 
 const BeispielAufgabe1 = {
   type: jsPsychStandardProgressiveMatricesBeispiel,
-  prompt: "Bitte schauen Sie sich zunächst folgende Matrix genau an:",
+  prompt: `<br> <br>Bitte betrachten Sie die folgenden Antwortmöglichkeiten und versuchen Sie, die richtige Lösung zu finden. 
+        Es ist immer nur genau eine der vorgegebenen Auswahlmöglichkeiten richtig.`,
   instructions:
     "Wählen Sie die <b><i>passende</i></b> Antwortalternative für das freie Feld der Matrix unten rechts.",
   allow_backwards: false,
@@ -177,7 +178,7 @@ const BeispielAufgabe1 = {
       allow_skipping: true,
       allow_backwards: false,
       prompt: `
-        Bitte betrachten Sie die folgenden Antwortmöglichkeiten und versuchen Sie, die richtige Lösung zu finden. 
+        <br>Bitte betrachten Sie die folgenden Antwortmöglichkeiten und versuchen Sie, die richtige Lösung zu finden. 
         Es ist immer nur genau eine der vorgegebenen Auswahlmöglichkeiten richtig.
       `,
     },
@@ -532,7 +533,7 @@ var angst_skala = {
 const HeiQ_A = {
   type: jsPsychStandardProgressiveMatrices,
   allow_skipping: true,
-  prompt: "<b>Bitte betrachten Sie die folgende Matrix:</b>",
+  prompt: "<br><b>Bitte betrachten Sie die folgende Matrix:</b>",
   instructions: `Bitte wählen Sie die <i>passende</i> Antwortalternative für das freie Feld der Matrix unten rechts.`,
   required: true,
   time_limit: 1500, // 25 Minuten in Sekunden
@@ -934,7 +935,7 @@ var fokus_frage_1 = {
           Wählen Sie bitte die Option aus, die am ehesten auf Ihre Gedankengänge zutrifft.
         </div>
       `,
-      name: "fokus1", 
+      name: "fokus1",
       options: [
         "Ich habe mich voll auf die aktuelle Aufgabe konzentriert",
         "Ich habe über meine Leistung bei der Aufgabe nachgedacht und/oder darüber, wie lange sie dauern könnte",
@@ -981,7 +982,7 @@ const Instructions_block_2 = {
 // 5.9 Block B: HeiQ_B mit on_start/on_finish
 const HeiQ_B = {
   type: jsPsychStandardProgressiveMatrices,
-  prompt: "<b>Bitte betrachten Sie die folgende Matrix:</b>",
+  prompt: "<br><br><b>Bitte betrachten Sie die folgende Matrix:</b>",
   instructions: `Bitte wählen Sie die <i>passende</i> Antwortalternative für das freie Feld der Matrix unten rechts.`,
   time_limit: 1500, // 25 Minuten in Sekunden
   allow_backwards: false,
@@ -1423,13 +1424,10 @@ var geraeusche_frage_reduktion = {
       prompt: `<div class="instructions"> <br>
           Wo haben Sie die Testung durchgeführt?
         </div>`,
-      options: [
-        "Am Institut",
-        "Zuhause"
-      ],
+      options: ["Am Institut", "Zuhause"],
       name: "untersuchungsort",
       required: true,
-    }
+    },
   ],
   button_label: "Weiter",
   on_load: function () {
@@ -1585,11 +1583,9 @@ var aufklaerung = {
   },
 };
 
-
 // ===========================
 // 6. Alle timeline.push() ans Ende verschieben
 // ===========================
-
 
 timeline.push(einleitung);
 timeline.push(geraeusche_frage);
