@@ -1,0 +1,14 @@
+"rt","response","trial_type","trial_index","plugin_version","time_elapsed","stimulus"
+"7091","{""Geschlecht"":""Nicht-binär"",""Alter"":""25-35"",""Studiengang"":""fvsd"",""Bildungsabschluss"":""Bachelorabschluss""}","survey","0","2.0.0","7130",""
+"1084","0","html-button-response","1","2.0.0","8215"," <div class=""instructions""> <p>Vielen Dank für Ihre Teilnahme! Falls Sie für 
+  Ihre Teilnahme mit Versuchspersonenstunden vergütet werden möchten, senden Sie bitte eine
+   E-Mail mit Ihrem vollen Namen und dem Stichwort ""VPN-Stunden"" an andrea.quint@stud.uni-heidelberg.de</p> </div>"
+"827","0","html-button-response","2","2.0.0","9043","<div class=""instructions"">
+    <p>Vielen Dank, dass Sie an dieser Studie teilgenommen haben! In dieser Untersuchung ging es darum, die Auswirkungen unterschiedlicher Testumgebungen (zu Hause vs. Labor) auf die Leistung bei Intelligenztests zu erforschen. Daher wurden die Aufgaben von einer Gruppe an Probanden in ihrer häuslichen Umgebung und von der anderen Gruppe an Probanden in einer laborartigen Umgebung am psychologischen Institut durchgeführt. </p>
+    
+    <p> Insbesondere haben wir untersucht, ob Ablenkungen in verschiedenen Umgebungen unterschiedlich stark wirken und wie sich dies auf die Testleistung auswirkt. Daher waren während der Bearbeitung von einer der beiden Testhälften verschiedene Geräusche im Hintergrund zu hören.</p>
+
+    <p> Sollten Sie Fragen oder Anmerkungen zur Studie haben oder wenn Sie über die Ergebnisse informiert werden möchten, können Sie sich gerne jederzeit an uns wenden (andrea.quint@stud.uni-heidelberg.de).  </p>
+
+    <p>Ihre Teilnahme ist von großem Wert, und wir danken Ihnen herzlich für Ihre Unterstützung! </p>
+  </div>"

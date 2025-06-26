@@ -1575,12 +1575,7 @@ var aufklaerung = {
 
     <p>Ihre Teilnahme ist von großem Wert, und wir danken Ihnen herzlich für Ihre Unterstützung! </p>
   </div>`,
-  choices: ["Studie beenden und Browser-Tab schließen"],
-  on_finish: function () {
-    // Beende die Studie und schließe den Tab
-    jsPsych.abortExperiment();
-    window.close(); // Schließt den Tab, wenn möglich
-  },
+  choices: ["Studie beenden"],
 };
 
 // ===========================
