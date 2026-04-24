@@ -133,3 +133,13 @@ body,
   line-height: 1.6 !important; /* gleicher Zeilenabstand */
   /* … und bei Bedarf background/border identisch zu .instructions … */
 }
+
+.fokus-prozent-form label {
+  display: block;
+  margin: 0.85em 0;
+}
+
+.fokus-prozent-form input[type="number"] {
+  width: 5.5em;
+  margin-right: 0.35em;
+}

@@ -925,28 +925,52 @@ var HeiQ_A_fertig = {
 };
 
 var fokus_frage_1 = {
-  type: jsPsychSurveyMultiChoice,
-  questions: [
-    {
-      prompt: `
-        <div class="instructions">
-          Wir möchten Sie nun bitten, die folgende Frage zu Ihren Gedanken 
-          während der Bearbeitung der vorangegangenen Aufgaben zu beantworten. 
-          Wählen Sie bitte die Option aus, die am ehesten auf Ihre Gedankengänge zutrifft.
-        </div>
-      `,
-      name: "fokus1",
-      options: [
-        "Ich habe mich voll auf die aktuelle Aufgabe konzentriert",
-        "Ich habe über meine Leistung bei der Aufgabe nachgedacht und/oder darüber, wie lange sie dauern könnte",
-        "Ich war abgelenkt durch etwas in der Umgebung",
-        "Ich war in Gedanken unterwegs, ohne dass es einen äußeren Anlass gab",
-        "keine der oben genannten Optionen trifft zu",
-      ],
-      required: true,
-    },
-  ],
+  type: jsPsychSurveyHtmlForm,
+  preamble: `
+    <div class="instructions">
+    <p>Wir möchten Sie nun bitten, die folgende Frage zu Ihren Gedanken 
+          während der Bearbeitung der vorangegangenen Aufgaben zu beantworten. </p>
+      <p>Wieviel Prozent der Zeit, in der Sie die Aufgabe bearbeitet haben, haben Sie sich gedanklich mit der Aufgabe bzw mit anderen Dingen beschäftigt? Bitte achten Sie darauf, dass ihre Prozentangaben nur ganze Zahlen beinhalten und sich zu 100 aufaddieren sollten.</p>
+    </div>
+  `,
+  html: `
+    <div class="instructions fokus-prozent-form">
+      <label><input type="number" name="fokus1_aufgabe_konzentriert" min="0" max="100" step="1" required> % Ich habe mich auf die Aufgabe konzentriert</label>
+      <label><input type="number" name="fokus1_leistung_nachgedacht" min="0" max="100" step="1" required> % Ich habe über meine Leistung in der Aufgabe nachgedacht und/oder darüber, wie lange sie dauern könnte</label>
+      <label><input type="number" name="fokus1_umgebung_abgelenkt" min="0" max="100" step="1" required> % Ich war durch etwas in der Umgebung abgelenkt</label>
+      <label><input type="number" name="fokus1_gedanken_woanders" min="0" max="100" step="1" required> % Ich war mit meinen Gedanken wo anders, ohne dass es dafür einen Auslöser in der Umgebung gab</label>
+      <label><input type="number" name="fokus1_keine_aussage" min="0" max="100" step="1" required> % Keine der obigen Aussagen traf zu</label>
+      <div id="fokus1-summenfehler" style="display: none; color: red; margin-top: 1em;">
+        Die Prozentangaben müssen sich zu 100 aufaddieren.
+      </div>
+    </div>
+  `,
   button_label: "Weiter",
+  on_load: function () {
+    var form = document.querySelector("#jspsych-survey-html-form");
+    var inputs = Array.from(
+      document.querySelectorAll(".fokus-prozent-form input[type='number']"),
+    );
+    var error = document.getElementById("fokus1-summenfehler");
+
+    form.addEventListener(
+      "submit",
+      function (event) {
+        var sum = inputs.reduce(function (total, input) {
+          return total + Number(input.value || 0);
+        }, 0);
+
+        if (sum !== 100) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          error.style.display = "block";
+        } else {
+          error.style.display = "none";
+        }
+      },
+      true,
+    );
+  },
 };
 
 // 5.8 Block 2 Instruktionen
@@ -1361,24 +1385,51 @@ const HeiQ_B = {
 
 // 5.10 Zweite Fokussierungsfrage
 var fokus_frage_2 = {
-  type: jsPsychSurveyMultiChoice,
-  questions: [
-    {
-      prompt: ` <div class="instructions" > Sie sind nun fertig mit der Intelligenztestung. Wir möchten 
-      Sie erneut bitten, die folgende Frage zu Ihren Gedanken während der Bearbeitung der 
-      vorangegangenen Aufgaben zu beantworten. Wählen Sie bitte die Option aus, die am ehesten 
-      auf Ihre Gedankengänge zutrifft. </div>`,
-      options: [
-        "Ich habe mich voll auf die aktuelle Aufgabe konzentriert",
-        "Ich habe über meine Leistung bei der Aufgabe nachgedacht und/oder darüber, wie lange sie dauern könnte",
-        "Ich war abgelenkt durch etwas in der Umgebung",
-        "Ich war in Gedanken unterwegs, ohne dass es einen äußeren Anlass gab",
-        "keine der oben genannten Optionen trifft zu",
-      ],
-      required: !test_modus,
-    },
-  ],
+  type: jsPsychSurveyHtmlForm,
+  preamble: `
+    <div class="instructions">
+      <p>Sie sind nun fertig mit der Intelligenztestung. Wir möchten Sie erneut bitten, die folgende Frage zu Ihren Gedanken während der Bearbeitung der vorangegangenen Aufgaben zu beantworten.</p>
+      <p>Wieviel Prozent der Zeit, in der Sie die Aufgabe bearbeitet haben, haben Sie sich gedanklich mit der Aufgabe bzw mit anderen Dingen beschäftigt? Bitte achten Sie darauf, dass ihre Prozentangaben nur ganze Zahlen beinhalten und sich zu 100 aufaddieren sollten.</p>
+    </div>
+  `,
+  html: `
+    <div class="instructions fokus-prozent-form">
+      <label><input type="number" name="fokus2_aufgabe_konzentriert" min="0" max="100" step="1" required> % Ich habe mich auf die Aufgabe konzentriert</label>
+      <label><input type="number" name="fokus2_leistung_nachgedacht" min="0" max="100" step="1" required> % Ich habe über meine Leistung in der Aufgabe nachgedacht und/oder darüber, wie lange sie dauern könnte</label>
+      <label><input type="number" name="fokus2_umgebung_abgelenkt" min="0" max="100" step="1" required> % Ich war durch etwas in der Umgebung abgelenkt</label>
+      <label><input type="number" name="fokus2_gedanken_woanders" min="0" max="100" step="1" required> % Ich war mit meinen Gedanken wo anders, ohne dass es dafür einen Auslöser in der Umgebung gab</label>
+      <label><input type="number" name="fokus2_keine_aussage" min="0" max="100" step="1" required> % Keine der obigen Aussagen traf zu</label>
+      <div id="fokus2-summenfehler" style="display: none; color: red; margin-top: 1em;">
+        Die Prozentangaben müssen sich zu 100 aufaddieren.
+      </div>
+    </div>
+  `,
   button_label: "Weiter",
+  on_load: function () {
+    var form = document.querySelector("#jspsych-survey-html-form");
+    var inputs = Array.from(
+      document.querySelectorAll(".fokus-prozent-form input[type='number']"),
+    );
+    var error = document.getElementById("fokus2-summenfehler");
+
+    form.addEventListener(
+      "submit",
+      function (event) {
+        var sum = inputs.reduce(function (total, input) {
+          return total + Number(input.value || 0);
+        }, 0);
+
+        if (sum !== 100) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          error.style.display = "block";
+        } else {
+          error.style.display = "none";
+        }
+      },
+      true,
+    );
+  },
 };
 
 // 5.11 Zweite Frage: Geräuschreduzierung
@@ -1433,7 +1484,7 @@ var geraeusche_frage_reduktion = {
   on_load: function () {
     // Container der 3. Frage
     var container = document.querySelectorAll(
-      ".jspsych-survey-multi-choice-question"
+      ".jspsych-survey-multi-choice-question",
     )[2];
 
     // Erstelle das Textfeld-Element (ohne Label)
@@ -1459,7 +1510,7 @@ var geraeusche_frage_reduktion = {
 
     // Füge das Textfeld direkt nach der "Ja"-Option ein
     var options = container.querySelectorAll(
-      ".jspsych-survey-multi-choice-option"
+      ".jspsych-survey-multi-choice-option",
     );
     options.forEach(function (opt) {
       if (opt.innerText.includes("Ja, es gab weitere Störungen:")) {
