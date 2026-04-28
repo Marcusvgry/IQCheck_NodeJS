@@ -1610,7 +1610,7 @@ var vpn_hinweis = {
   type: jsPsychHtmlButtonResponse,
   stimulus: ` <div class="instructions"> <p>Vielen Dank für Ihre Teilnahme! Falls Sie für 
   Ihre Teilnahme mit Versuchspersonenstunden vergütet werden möchten, senden Sie bitte eine
-   E-Mail mit Ihrem vollen Namen und dem Stichwort "VPN-Stunden" an andrea.quint@stud.uni-heidelberg.de</p> </div>`,
+   E-Mail mit Ihrem vollen Namen und dem Stichwort "VPN-Stunden" an studien.ap@psychologie.uni-heidelberg.de</p> </div>`,
   choices: ["Weiter"],
 };
 
@@ -1622,7 +1622,7 @@ var aufklaerung = {
     
     <p> Insbesondere haben wir untersucht, ob Ablenkungen in verschiedenen Umgebungen unterschiedlich stark wirken und wie sich dies auf die Testleistung auswirkt. Daher waren während der Bearbeitung von einer der beiden Testhälften verschiedene Geräusche im Hintergrund zu hören.</p>
 
-    <p> Sollten Sie Fragen oder Anmerkungen zur Studie haben oder wenn Sie über die Ergebnisse informiert werden möchten, können Sie sich gerne jederzeit an uns wenden (andrea.quint@stud.uni-heidelberg.de).  </p>
+    <p> Sollten Sie Fragen oder Anmerkungen zur Studie haben oder wenn Sie über die Ergebnisse informiert werden möchten, können Sie sich gerne jederzeit an uns wenden (studien.ap@psychologie.uni-heidelberg.de).  </p>
 
     <p>Ihre Teilnahme ist von großem Wert, und wir danken Ihnen herzlich für Ihre Unterstützung! </p>
   </div>`,
