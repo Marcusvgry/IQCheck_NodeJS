@@ -1,2 +1,0 @@
-# IQCheck_NodeJS
-

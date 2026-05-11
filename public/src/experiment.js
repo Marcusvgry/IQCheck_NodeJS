@@ -6,33 +6,208 @@ var test_modus = false;
 // → Wenn test_modus == false, sind alle Fragebögen 'required'.
 
 var timeline = [];
+const LAB_FILE_SUFFIX = "_lab";
+const subject_id = generateRandomID();
+const url_params = new URLSearchParams(window.location.search);
+const offline_modus =
+  window.location.protocol === "file:" || url_params.get("offline") === "1";
+const experiment_filename = `${subject_id}${offline_modus ? LAB_FILE_SUFFIX : ""}.csv`;
+let offline_data_directory = null;
+
+function generateRandomID(length = 15) {
+  var chars = "0123456789abcdef";
+  var id = "";
+
+  if (window.crypto && window.crypto.getRandomValues) {
+    var values = new Uint8Array(length);
+    window.crypto.getRandomValues(values);
+    for (var i = 0; i < values.length; i++) {
+      id += chars[values[i] % chars.length];
+    }
+    return id;
+  }
+
+  while (id.length < length) {
+    id += Math.random().toString(16).slice(2);
+  }
+  return id.slice(0, length);
+}
+
+function supportsDirectorySave() {
+  return typeof window.showDirectoryPicker === "function";
+}
+
+async function requestDirectoryPermission(directoryHandle) {
+  var options = { mode: "readwrite" };
+  if ((await directoryHandle.queryPermission(options)) === "granted") {
+    return true;
+  }
+  return (await directoryHandle.requestPermission(options)) === "granted";
+}
+
+function renderOfflineSetup({ downloadOnly = false } = {}) {
+  return new Promise(function (resolve) {
+    document.body.innerHTML = `
+      <main style="min-height: 100vh; display: grid; place-items: center; padding: 2rem;">
+        <div class="instructions" style="max-width: 760px;">
+          <p><strong>Offline-Modus</strong></p>
+          ${
+            downloadOnly
+              ? `<p>Dieser Browser erlaubt keinen direkten Zugriff auf lokale Ordner. Die CSV wird am Ende als Download mit dem Namen <strong>${experiment_filename}</strong> gespeichert. Bitte legen Sie die Datei anschließend in den Ordner <strong>data</strong>.</p>`
+              : `<p>Bitte wählen Sie jetzt den Ordner <strong>data</strong> aus. Am Ende der Studie wird die CSV automatisch dort als <strong>${experiment_filename}</strong> gespeichert.</p>`
+          }
+          <div id="offline-setup-message" style="color: #b00020; min-height: 1.5em;"></div>
+          <button id="offline-setup-button" class="jspsych-btn">
+            ${downloadOnly ? "Studie starten" : "data-Ordner auswählen"}
+          </button>
+        </div>
+      </main>
+    `;
+
+    var button = document.getElementById("offline-setup-button");
+    var message = document.getElementById("offline-setup-message");
+
+    button.addEventListener("click", async function () {
+      if (downloadOnly) {
+        document.body.innerHTML = "";
+        resolve();
+        return;
+      }
+
+      try {
+        var directoryHandle = await window.showDirectoryPicker({
+          id: "iqcheck-lab-data",
+          mode: "readwrite",
+        });
+
+        if (directoryHandle.name.toLowerCase() !== "data") {
+          message.textContent =
+            'Bitte wählen Sie den Ordner mit dem Namen "data" aus.';
+          return;
+        }
+
+        var hasPermission = await requestDirectoryPermission(directoryHandle);
+        if (!hasPermission) {
+          message.textContent =
+            "Der Schreibzugriff wurde nicht freigegeben. Bitte versuchen Sie es erneut.";
+          return;
+        }
+
+        offline_data_directory = directoryHandle;
+        document.body.innerHTML = "";
+        resolve();
+      } catch (error) {
+        if (error && error.name === "AbortError") {
+          message.textContent =
+            'Bitte wählen Sie den Ordner "data" aus, bevor die Studie startet.';
+        } else {
+          message.textContent =
+            "Der Ordner konnte nicht geöffnet werden. Bitte versuchen Sie es erneut.";
+          console.error("Fehler beim Auswählen des data-Ordners:", error);
+        }
+      }
+    });
+  });
+}
+
+async function prepareOfflineMode() {
+  if (!offline_modus) {
+    return;
+  }
+
+  await renderOfflineSetup({ downloadOnly: !supportsDirectorySave() });
+}
+
+async function saveCsvToDirectory(csv) {
+  var fileHandle = await offline_data_directory.getFileHandle(
+    experiment_filename,
+    { create: true },
+  );
+  var writable = await fileHandle.createWritable();
+  await writable.write(csv);
+  await writable.close();
+}
+
+function downloadCsv(csv) {
+  var blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  var url = URL.createObjectURL(blob);
+  var link = document.createElement("a");
+  link.href = url;
+  link.download = experiment_filename;
+  link.style.display = "none";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(function () {
+    URL.revokeObjectURL(url);
+  }, 1000);
+}
+
+function showSaveResult(message) {
+  document.body.innerHTML = `
+    <main style="min-height: 100vh; display: grid; place-items: center; padding: 2rem;">
+      <div class="instructions" style="max-width: 760px;">
+        <p><strong>Studie abgeschlossen</strong></p>
+        <p>${message}</p>
+      </div>
+    </main>
+  `;
+}
+
+async function saveExperimentCsv(csv) {
+  if (offline_modus) {
+    if (offline_data_directory) {
+      await saveCsvToDirectory(csv);
+      return `Die CSV wurde im ausgewählten data-Ordner gespeichert: <strong>${experiment_filename}</strong>`;
+    }
+
+    downloadCsv(csv);
+    return `Die CSV wurde als Download gespeichert: <strong>${experiment_filename}</strong>. Bitte legen Sie sie in den Ordner <strong>data</strong>.`;
+  }
+
+  var response = await fetch("/experiment-data", {
+    method: "POST",
+    headers: {
+      "Content-Type": "text/plain",
+      "X-Experiment-Filename": experiment_filename,
+    },
+    body: csv,
+  });
+
+  if (!response.ok) {
+    throw new Error(await response.text());
+  }
+
+  return `Die CSV wurde im data-Ordner des Servers gespeichert: <strong>${experiment_filename}</strong>`;
+}
 
 // 2. jsPsych-Initalisierung
 const jsPsych = initJsPsych({
-  on_finish: function () {
-    // 1) CSV generieren
+  on_finish: async function () {
+    jsPsych.data.addProperties({
+      subject_id: subject_id,
+      data_filename: experiment_filename,
+      save_context: offline_modus ? "lab" : "server",
+      save_mode: offline_modus ? "offline" : "server",
+    });
+
     const csv = jsPsych.data.get().csv();
 
-    // 2) per fetch-POST an /experiment-data senden
-    fetch("/experiment-data", {
-      method: "POST",
-      headers: {
-        "Content-Type": "text/plain",
-      },
-      body: csv,
-    })
-      .then((response) => response.text())
-      .then((msg) => {
-        console.log(msg); // "Experiment-Daten erfolgreich gespeichert"
-      })
-      .catch((error) => {
-        console.error("Fehler beim Speichern der Daten:", error);
-        alert("Fehler beim Speichern der Daten.");
-      });
+    try {
+      const message = await saveExperimentCsv(csv);
+      showSaveResult(message);
+    } catch (error) {
+      console.error("Fehler beim Speichern der Daten:", error);
+      downloadCsv(csv);
+      showSaveResult(
+        `Die automatische Speicherung ist fehlgeschlagen. Die CSV wurde stattdessen als Download gespeichert: <strong>${experiment_filename}</strong>.`,
+      );
+    }
   },
 });
 
-function startExperiment() {
+async function startExperiment() {
+  await prepareOfflineMode();
   jsPsych.run(timeline);
 }
 

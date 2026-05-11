@@ -17,6 +17,17 @@ function generateRandomID(length = 15) {
   return randomBytes(length).toString('hex').slice(0, length);
 }
 
+function getCsvFilename(requestedFilename) {
+  if (
+    typeof requestedFilename === 'string' &&
+    /^[a-zA-Z0-9_-]+(?:_lab)?\.csv$/.test(requestedFilename)
+  ) {
+    return requestedFilename;
+  }
+
+  return `${generateRandomID()}.csv`;
+}
+
 const app = express();
 
 // Statische Assets
@@ -45,12 +56,11 @@ app.get('/', (req, res) => {
 // POST-Endpoint zum Speichern der Experiment-Daten als CSV
 app.post('/experiment-data', (req, res) => {
   const experimentCSV = req.body;
-  const subject_id = generateRandomID();
-  const filename   = `${subject_id}.csv`;
+  const filename = getCsvFilename(req.get('X-Experiment-Filename'));
 
   const dataDir = path.join(__dirname, 'data');
   if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir);
+    fs.mkdirSync(dataDir, { recursive: true });
   }
   const filePath = path.join(dataDir, filename);
   fs.writeFile(filePath, experimentCSV, err => {
@@ -58,7 +68,7 @@ app.post('/experiment-data', (req, res) => {
       console.error('Error saving CSV:', err);
       return res.status(500).send('Fehler beim Speichern der Experiment-Daten');
     }
-    res.status(200).send('Experiment-Daten erfolgreich gespeichert');
+    res.status(200).send(`Experiment-Daten erfolgreich gespeichert: ${filename}`);
   });
 });
 
