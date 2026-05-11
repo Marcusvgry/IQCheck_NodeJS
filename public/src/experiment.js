@@ -45,65 +45,38 @@ async function requestDirectoryPermission(directoryHandle) {
   return (await directoryHandle.requestPermission(options)) === "granted";
 }
 
-function renderOfflineSetup({ downloadOnly = false } = {}) {
+async function selectOfflineDataDirectory() {
+  var directoryHandle = await window.showDirectoryPicker({
+    id: "iqcheck-lab-data",
+    mode: "readwrite",
+  });
+
+  var hasPermission = await requestDirectoryPermission(directoryHandle);
+  if (!hasPermission) {
+    throw new Error("Der Schreibzugriff wurde nicht freigegeben.");
+  }
+
+  offline_data_directory = directoryHandle;
+}
+
+function renderOfflineDirectoryButton() {
   return new Promise(function (resolve) {
     document.body.innerHTML = `
       <main style="min-height: 100vh; display: grid; place-items: center; padding: 2rem;">
-        <div class="instructions" style="max-width: 760px;">
-          <p><strong>Offline-Modus</strong></p>
-          ${
-            downloadOnly
-              ? `<p>Dieser Browser erlaubt keinen direkten Zugriff auf lokale Ordner. Die CSV wird am Ende als Download mit dem Namen <strong>${experiment_filename}</strong> gespeichert. Bitte legen Sie die Datei anschließend in den Ordner <strong>data</strong>.</p>`
-              : `<p>Bitte wählen Sie jetzt den Ordner <strong>data</strong> aus. Am Ende der Studie wird die CSV automatisch dort als <strong>${experiment_filename}</strong> gespeichert.</p>`
-          }
-          <div id="offline-setup-message" style="color: #b00020; min-height: 1.5em;"></div>
-          <button id="offline-setup-button" class="jspsych-btn">
-            ${downloadOnly ? "Studie starten" : "data-Ordner auswählen"}
-          </button>
-        </div>
+        <button id="offline-setup-button" class="jspsych-btn">Ordner auswählen</button>
       </main>
     `;
 
     var button = document.getElementById("offline-setup-button");
-    var message = document.getElementById("offline-setup-message");
 
     button.addEventListener("click", async function () {
-      if (downloadOnly) {
-        document.body.innerHTML = "";
-        resolve();
-        return;
-      }
-
       try {
-        var directoryHandle = await window.showDirectoryPicker({
-          id: "iqcheck-lab-data",
-          mode: "readwrite",
-        });
-
-        if (directoryHandle.name.toLowerCase() !== "data") {
-          message.textContent =
-            'Bitte wählen Sie den Ordner mit dem Namen "data" aus.';
-          return;
-        }
-
-        var hasPermission = await requestDirectoryPermission(directoryHandle);
-        if (!hasPermission) {
-          message.textContent =
-            "Der Schreibzugriff wurde nicht freigegeben. Bitte versuchen Sie es erneut.";
-          return;
-        }
-
-        offline_data_directory = directoryHandle;
+        await selectOfflineDataDirectory();
         document.body.innerHTML = "";
         resolve();
       } catch (error) {
-        if (error && error.name === "AbortError") {
-          message.textContent =
-            'Bitte wählen Sie den Ordner "data" aus, bevor die Studie startet.';
-        } else {
-          message.textContent =
-            "Der Ordner konnte nicht geöffnet werden. Bitte versuchen Sie es erneut.";
-          console.error("Fehler beim Auswählen des data-Ordners:", error);
+        if (!error || error.name !== "AbortError") {
+          console.error("Fehler beim Auswählen des Speicherordners:", error);
         }
       }
     });
@@ -115,7 +88,20 @@ async function prepareOfflineMode() {
     return;
   }
 
-  await renderOfflineSetup({ downloadOnly: !supportsDirectorySave() });
+  if (!supportsDirectorySave()) {
+    return;
+  }
+
+  document.body.innerHTML = "";
+
+  try {
+    await selectOfflineDataDirectory();
+  } catch (error) {
+    if (!error || error.name !== "AbortError") {
+      console.error("Fehler beim automatischen Öffnen des Ordnerdialogs:", error);
+    }
+    await renderOfflineDirectoryButton();
+  }
 }
 
 async function saveCsvToDirectory(csv) {
@@ -158,11 +144,11 @@ async function saveExperimentCsv(csv) {
   if (offline_modus) {
     if (offline_data_directory) {
       await saveCsvToDirectory(csv);
-      return `Die CSV wurde im ausgewählten data-Ordner gespeichert: <strong>${experiment_filename}</strong>`;
+      return `Die CSV wurde im ausgewählten Ordner gespeichert: <strong>${experiment_filename}</strong>`;
     }
 
     downloadCsv(csv);
-    return `Die CSV wurde als Download gespeichert: <strong>${experiment_filename}</strong>. Bitte legen Sie sie in den Ordner <strong>data</strong>.`;
+    return `Die CSV wurde als Download gespeichert: <strong>${experiment_filename}</strong>.`;
   }
 
   var response = await fetch("/experiment-data", {
